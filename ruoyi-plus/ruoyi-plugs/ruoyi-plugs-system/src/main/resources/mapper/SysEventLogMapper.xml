@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.plugs.system.mapper.SysEventLogMapper">
+
+    <resultMap type="SysEventLog" id="SysEventLogResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="eventCode"    column="event_code"    />
+        <result property="eventName"    column="event_name"    />
+        <result property="source"    column="source"    />
+        <result property="datas"    column="datas"    />
+        <result property="result"    column="result"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="flag"    column="flag"    />
+
+        <result property="userName"    column="user_name"    />
+    </resultMap>
+
+    <sql id="selectSysEventLogVo">
+        select a.id, a.user_id, b.user_name, a.event_code, a.event_name, a.source, a.datas, a.result, a.create_time, a.flag
+        from plugs_sys_event_log a left join sys_user b
+        on a.user_id=b.user_id
+    </sql>
+
+    <select id="selectSysEventLogList" parameterType="SysEventLog" resultMap="SysEventLogResult">
+        <include refid="selectSysEventLogVo"/>
+        <where>
+            <if test="userId != null  and userId != ''"> and a.user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and b.user_name like concat('%', #{userName}, '%')</if>
+            <if test="eventCode != null  and eventCode != ''"> and a.event_code like concat('%', #{eventCode}, '%')</if>
+            <if test="eventName != null  and eventName != ''"> and a.event_name like concat('%', #{eventName}, '%')</if>
+            <if test="source != null  and source != ''"> and a.source = #{source}</if>
+            <if test="result != null "> and a.result = #{result}</if>
+        </where>
+    </select>
+
+    <select id="selectSysEventLogById" parameterType="Long" resultMap="SysEventLogResult">
+        <include refid="selectSysEventLogVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysEventLog" parameterType="SysEventLog" useGeneratedKeys="true" keyProperty="id">
+        insert into plugs_sys_event_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="eventCode != null">event_code,</if>
+            <if test="eventName != null">event_name,</if>
+            <if test="source != null">source,</if>
+            <if test="datas != null">datas,</if>
+            <if test="result != null">result,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="flag != null">flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="eventCode != null">#{eventCode},</if>
+            <if test="eventName != null">#{eventName},</if>
+            <if test="source != null">#{source},</if>
+            <if test="datas != null">#{datas},</if>
+            <if test="result != null">#{result},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="flag != null">#{flag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysEventLog" parameterType="SysEventLog">
+        update plugs_sys_event_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="eventCode != null">event_code = #{eventCode},</if>
+            <if test="eventName != null">event_name = #{eventName},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="datas != null">datas = #{datas},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="flag != null">flag = #{flag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysEventLogById" parameterType="Long">
+        delete from plugs_sys_event_log where id = #{id}
+    </delete>
+
+    <delete id="deleteSysEventLogByIds" parameterType="String">
+        delete from plugs_sys_event_log where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

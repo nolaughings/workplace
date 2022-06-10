@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>檀索科技</title>
+    <link href="/css/index.css" rel="stylesheet" />
+    <link href="/css/pension_robot.css" rel="stylesheet" />
+    <link href="/css/element.css" rel="stylesheet" />
+    <script src="/jquery.js" type="text/javascript"></script>
+    <script src="/vue.js" type="text/javascript"></script>
+    <script src="/element.js" type="text/javascript"></script>
+    <script src="/components.js" type="text/javascript"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <ts-frame now="1">
+        <div class="hd-title">
+            <div class="container clear">
+                <div class="hd-title-left fl" th:text="${chassisdetail.chassisName}"></div>
+            </div>
+        </div>
+        <div>
+            <div class="fullpage-img">
+                <img th:src="${chassisdetail.chassisImg}" />
+            </div>
+            <div class="fullpage-img">
+                <img th:src="${chassisdetail.chassisFunction}" />
+            </div>
+        </div>
+    </ts-frame>
+</div>
+</body>
+<script type="text/javascript">
+    var app = new Vue({
+        el:"#app",
+        data:function(){
+            return {
+            }
+        },
+        methods:{
+        }
+    })
+</script>
+</html>

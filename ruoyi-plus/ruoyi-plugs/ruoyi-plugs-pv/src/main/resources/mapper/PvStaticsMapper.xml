@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.plugs.pv.mapper.PvStaticsMapper">
+
+
+    <resultMap type="PvCount" id="PvCountResult">
+        <result property="id"    column="id"    />
+        <result property="day"    column="day"    />
+        <result property="count"    column="count"    />
+    </resultMap>
+
+    <sql id="selectPvCountVo">
+        select id, day,count from plugs_sys_pv_count
+    </sql>
+
+    <insert id="insertPvCount" parameterType="PvCount" useGeneratedKeys="true" keyProperty="id">
+        insert into plugs_sys_pv_count
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="day != null ">day,</if>
+            <if test="count != null ">count,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="day != null ">#{day},</if>
+            <if test="count != null ">#{count},</if>
+        </trim>
+    </insert>
+    <update id="updatePvCount" parameterType="PvCount">
+        update plugs_sys_pv_count
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="day != null ">day = #{day},</if>
+            <if test="count != null ">count = #{count},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <select id="selectTotalCount" parameterType="String" resultType="int">
+        select IFNULL(sum(count),0) from plugs_sys_pv_count
+    </select>
+
+    <select id="selectCountByDay" parameterType="String" resultType="int">
+        select count from plugs_sys_pv_count
+        where day = #{day}
+    </select>
+    <select id="getPvCountByDay" parameterType="String" resultMap="PvCountResult">
+        <include refid="selectPvCountVo"/>
+        where day = #{day}
+    </select>
+
+    <select id="selectUserCount" resultType="int">
+        select count(1) from sys_user
+    </select>
+    <select id="selectArticlesCount" resultType="int">
+        select 0
+    </select>
+    <select id="selectTodayCount" resultType="int">
+        select SUM(count) from
+        (
+        select count(1) count from resource_template where to_days(create_time) = to_days(now())
+        UNION ALL
+        select count(1) count from resource_template_segment where to_days(create_time) = to_days(now())
+        UNION ALL
+        select count(1) count from resource_code where to_days(create_time) = to_days(now())
+        UNION ALL
+        select count(1) count from resource_audio_effect where to_days(create_time) = to_days(now())
+        )t
+    </select>
+    <select id="selectWeekCount" resultType="int">
+        select SUM(count) from
+        (
+        select count(1) count from resource_template where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;=date(create_time)
+        UNION ALL
+        select count(1) count from resource_template_segment where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;=date(create_time)
+        UNION ALL
+        select count(1) count from resource_code where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;=date(create_time)
+        UNION ALL
+        select count(1) count from resource_audio_effect where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;=date(create_time)
+        )t
+    </select>
+</mapper>

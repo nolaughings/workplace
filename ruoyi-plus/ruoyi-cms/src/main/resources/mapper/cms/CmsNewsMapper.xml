@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsNewsMapper">
+    
+    <resultMap type="CmsNews" id="CmsNewsResult">
+        <result property="newsId"    column="news_id"    />
+        <result property="newsImg"    column="news_img"    />
+        <result property="newsTitle"    column="news_title"    />
+        <result property="newsContent"    column="news_content"    />
+        <result property="newsPublish"    column="news_publish"    />
+        <result property="newsPublishdate"    column="news_publishdate"    />
+    </resultMap>
+
+    <sql id="selectCmsNewsVo">
+        select news_id, news_img, news_title, news_content, news_publish, news_publishdate from cms_news
+    </sql>
+
+    <select id="selectCmsNewsList" parameterType="CmsNews" resultMap="CmsNewsResult">
+        <include refid="selectCmsNewsVo"/>
+        <where>  
+            <if test="newsTitle != null  and newsTitle != ''"> and news_title like concat('%', #{newsTitle}, '%')</if>
+            <if test="newsContent != null  and newsContent != ''"> and news_content like concat('%', #{newsContent}, '%')</if>
+            <if test="newsPublish != null "> and news_publish = #{newsPublish}</if>
+            <if test="newsPublishdate != null "> and news_publishdate = #{newsPublishdate}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsNewsByNewsId" parameterType="Long" resultMap="CmsNewsResult">
+        <include refid="selectCmsNewsVo"/>
+        where news_id = #{newsId}
+    </select>
+        
+    <insert id="insertCmsNews" parameterType="CmsNews">
+        insert into cms_news
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="newsId != null">news_id,</if>
+            <if test="newsImg != null and newsImg != ''">news_img,</if>
+            <if test="newsTitle != null and newsTitle != ''">news_title,</if>
+            <if test="newsContent != null and newsContent != ''">news_content,</if>
+            <if test="newsPublish != null">news_publish,</if>
+            <if test="newsPublishdate != null">news_publishdate,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="newsId != null">#{newsId},</if>
+            <if test="newsImg != null and newsImg != ''">#{newsImg},</if>
+            <if test="newsTitle != null and newsTitle != ''">#{newsTitle},</if>
+            <if test="newsContent != null and newsContent != ''">#{newsContent},</if>
+            <if test="newsPublish != null">#{newsPublish},</if>
+            <if test="newsPublishdate != null">#{newsPublishdate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsNews" parameterType="CmsNews">
+        update cms_news
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="newsImg != null and newsImg != ''">news_img = #{newsImg},</if>
+            <if test="newsTitle != null and newsTitle != ''">news_title = #{newsTitle},</if>
+            <if test="newsContent != null and newsContent != ''">news_content = #{newsContent},</if>
+            <if test="newsPublish != null">news_publish = #{newsPublish},</if>
+            <if test="newsPublishdate != null">news_publishdate = #{newsPublishdate},</if>
+        </trim>
+        where news_id = #{newsId}
+    </update>
+
+    <delete id="deleteCmsNewsByNewsId" parameterType="Long">
+        delete from cms_news where news_id = #{newsId}
+    </delete>
+
+    <delete id="deleteCmsNewsByNewsIds" parameterType="String">
+        delete from cms_news where news_id in 
+        <foreach item="newsId" collection="array" open="(" separator="," close=")">
+            #{newsId}
+        </foreach>
+    </delete>
+
+</mapper>

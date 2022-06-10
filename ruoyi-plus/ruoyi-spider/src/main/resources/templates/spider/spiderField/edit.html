@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改爬虫字段')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-spiderField-edit" th:object="${spiderField}">
+        <input name="fieldId" th:field="*{fieldId}" type="hidden">
+        <div class="form-group" style="display: none;">
+            <label class="col-sm-3 control-label">爬虫配置ID：</label>
+            <div class="col-sm-8">
+                <input name="configId" th:field="*{configId}" class="form-control" type="text" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">字段：</label>
+            <div class="col-sm-8">
+                <input name="field" th:field="*{field}" class="form-control" type="text" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">字段名称：</label>
+            <div class="col-sm-8">
+                <input name="fieldName" th:field="*{fieldName}" class="form-control" type="text" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">提取类型：</label>
+            <div class="col-sm-8">
+                <div class="radio-box" th:each="dict : ${@dict.getType('spider_extract_type')}">
+                    <input type="radio" th:id="${'extractType_' + dict.dictCode}" name="extractType" th:value="${dict.dictValue}" th:field="*{extractType}" required>
+                    <label th:for="${'extractType_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group extractBy">
+            <label class="col-sm-3 control-label">提取规则：</label>
+            <div class="col-sm-8">
+                <input name="extractBy" th:field="*{extractBy}" class="form-control" style="width: 150px;display: inline-block;"  type="text">
+                <label  class="check-box css" style="display: inline-block;">
+                    <input  name="extractBy2Flag" type="checkbox" th:checked="${not #strings.isEmpty(spiderField.extractBy2)}"  th:value="1" th:text="启用二级">
+                </label>
+                <input id="extractBy2" name="extractBy2" th:field="*{extractBy2}"  class="form-control css" style="width: 150px;display: inline-block;" type="text">
+            </div>
+        </div>
+        <div class="form-group constant"  style="display: none;">
+            <label class="col-sm-3 control-label">常量值：</label>
+            <div class="col-sm-8">
+                <input name="constantValue" th:field="*{constantValue}" style="width: 150px;"  class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group css"  style="display: none;">
+            <label class="col-sm-3 control-label">元素的索引：</label>
+            <div class="col-sm-8">
+                <input id="extractIndex" name="extractIndex" th:field="*{extractIndex}"  style="width: 150px;display: inline-block;" class="form-control" type="text">
+                <label  class="check-box" style="display: inline-block;">
+                    <input name="noLimit" type="checkbox" value="1" th:checked="${spiderField.extractIndex=='all'}" th:text="提取全部">
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group css"  style="display: none;">
+            <label class="col-sm-3 control-label">根据属性取值：</label>
+            <div class="col-sm-8">
+                <input id="extractAttrFlag" th:field="*{extractAttrFlag}"  name="extractAttrFlag" class="form-control" type="hidden">
+                <label class="toggle-switch switch-solid">
+                    <input type="checkbox" id="extractAttrCheckbox" th:checked="${spiderField.extractAttrFlag=='1'}"  >
+                    <span></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group css extractAttr_extend"  style="display: none;">
+            <label class="col-sm-3 control-label">属性名：</label>
+            <div class="col-sm-8">
+                <input name="extractAttr" th:field="*{extractAttr}" style="width: 150px;"  class="form-control" type="text">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">内置字段处理规则：</label>
+            <div class="col-sm-8">
+                <input type="hidden" id="spiderFieldHighSetting" name="spiderFieldHighSetting" th:field="*{spiderFieldHighSetting}" >
+                <div class="radio-box" th:each="dict : ${@dict.getType('spider_field_high_setting')}">
+                    <input type="radio" th:id="${'spiderFieldHighSettingRadio_' + dict.dictCode}" name="spiderFieldHighSettingRadio" th:value="${dict.dictValue}" th:checked="${spiderField.spiderFieldHighSetting==dict.dictValue}">
+                    <label th:for="${'spiderFieldHighSettingRadio_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group spiderFieldHighSettingParams"  style="display: none;">
+            <label class="col-sm-3 control-label">字段处理规则参数：</label>
+            <div class="col-sm-8">
+                <input id="spiderFieldHighSettingParams" name="spiderFieldHighSettingParams" th:field="*{spiderFieldHighSettingParams}"  class="form-control" type="hidden">
+                <input id="folder" placeholder="追加文件夹目录(可为空)" style="margin-top:10px;width: 200px;" class="form-control" type="text">
+                <input id="suffix" placeholder="文件后缀(可为空)" style="margin-top:10px;width: 200px;" class="form-control" type="text">
+                <input id="contentField" placeholder="内容字段(默认为content)" style="margin-top:10px;width: 200px;" class="form-control" type="text">
+            </div>
+        </div>
+
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<script type="text/javascript">
+    var prefix = ctx + "spider/spiderField";
+    $("#form-spiderField-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            var v=$("[name=spiderFieldHighSettingRadio]:checked").val();
+            if(v==0||v=='0'){
+                $("#spiderFieldHighSettingParams").val("");
+            }else{
+                if(v=="1"){//下载文件到本地
+                    $("#spiderFieldHighSettingParams").val($("#folder").val()+"#"+$("#suffix").val());
+                }else if(v=="2"){//下载内容详情里的图片
+                    $("#spiderFieldHighSettingParams").val($("#folder").val());
+                }else if(v=="3"){//选取内容详情图片的第一张作为封面图片
+                    $("#spiderFieldHighSettingParams").val($("#folder").val()+"#"+$("#contentField").val());
+                }
+            }
+            $.operate.save(prefix + "/edit", $('#form-spiderField-edit').serialize());
+        }
+    }
+    function showHideDiv(){
+        var v=$("[name=extractType]:checked").val();
+        if(v=="css"){
+            $(".css").show();
+            $(".constant").hide();
+            $(".extractBy").show();
+        }else if(v=="xpath"){
+            $(".css").hide();
+            $(".constant").hide();
+            $(".extractBy").show();
+            $("#extractAttrFlag").val("0");
+        }else{
+            //常量
+            $(".constant").show();
+            $(".css").hide();
+            $(".extractBy").hide();
+            $("#extractAttrFlag").val("0");
+
+        }
+    }
+    function showHideExtractAttr(v){
+        if(v){
+            $("#extractAttrFlag").val("1");
+            $(".extractAttr_extend").show();
+            $("#extractAttr").attr("required","required");
+        }else{
+            $("#extractAttrFlag").val("0");
+            $(".extractAttr_extend").hide();
+            $("#extractAttr").removeAttr("required");
+        }
+    }
+    var firstLoadFlag=true;
+    function onIndexChange(){
+        var v=$("#extractIndex").val();
+        var flag=false;
+        if(!$.common.isEmpty(v)){
+            if(v=="all"){
+                flag=true;
+            }else{
+                var arr=v.split(",");
+                var count=0;
+                for(var i=0;i<arr.length;i++){
+                    if(!$.common.isEmpty(arr[i])){
+                        count++;
+                    }
+                }
+                if(count>=2){
+                    flag=true;
+                }
+            }
+        }
+        if(flag){
+            $("[name='extractBy2Flag'][value='1']").iCheck('enable');
+            if(!firstLoadFlag){
+                $.modal.msgWarning("启用二级规则");
+            }else{
+                firstLoadFlag=false;
+            }
+
+        }else{
+            $("[name='extractBy2Flag'][value='1']").iCheck('disable');
+            if(!firstLoadFlag){
+                $.modal.msgWarning("禁用二级规则");
+            }else{
+                firstLoadFlag=false;
+            }
+        }
+
+    }
+    function noLimitChange(){
+        var limit=$("[name=noLimit]:checked").val();
+        if(limit==1||limit=='1'){
+            $("#extractIndex").attr("readonly","readonly");
+            $("#extractIndex").val("all");
+        }else{
+            $("#extractIndex").removeAttr("readonly");
+            $("#extractIndex").val("0");
+        }
+    }
+    function extractBy2Flag(){
+        var limit=$("[name=extractBy2Flag]:checked").val();
+        if(limit==1||limit=='1'){
+            $("#extractBy2").removeAttr("readonly");
+        }else{
+            $("#extractBy2").attr("readonly","readonly");
+            $("#extractBy2").val("");
+        }
+    }
+    function spiderFieldHighSettingRadio(){
+        var v=$("[name=spiderFieldHighSettingRadio]:checked").val();
+        var spiderFieldHighSettingParams=$("#spiderFieldHighSettingParams").val();
+        var arr=spiderFieldHighSettingParams.split("#");
+        if(v==0||v=='0'){
+            $("#spiderFieldHighSetting").val("");
+            $(".spiderFieldHighSettingParams").hide();
+        }else{
+            $("#spiderFieldHighSetting").val(v);
+            $(".spiderFieldHighSettingParams").show();
+        }
+        if(v=="1"){//下载文件到本地
+            $("#suffix").show();
+            $("#contentField").hide();
+            $("#folder").val(arr[0]);
+            $("#suffix").val(arr[1]);
+        }else if(v=="2"){//下载内容详情里的图片
+            $("#suffix").hide();
+            $("#contentField").hide();
+            $("#folder").val(arr[0]);
+        }else if(v=="3"){//选取内容详情图片的第一张作为封面图片
+            $("#suffix").hide();
+            $("#contentField").show();
+            $("#folder").val(arr[0]);
+            $("#contentField").val(arr[1]);
+        }
+    }
+    $(function(){
+        $('[name=extractType]').on('ifChecked', function(event){
+            showHideDiv();
+        });
+        showHideDiv();
+
+        $("#extractAttrCheckbox").on("change",function(){
+            var v=$(this).prop("checked");
+            showHideExtractAttr(v);
+        });
+        var v=$("#extractAttrFlag").val();
+        if(v==1||v=='1'){
+            $("#extractAttrFlag").val("1");
+            $(".extractAttr_extend").show();
+            $("#extractAttr").attr("required","required");
+        }else{
+            $(".extractAttr_extend").hide();
+            $("#extractAttr").removeAttr("required");
+        }
+
+        $('[name=noLimit]').on('ifChanged', function(event){
+            noLimitChange();
+            onIndexChange();
+        });
+        onIndexChange();
+        noLimitChange();
+
+        $('[name=extractBy2Flag]').on('ifChanged', function(event){
+            extractBy2Flag();
+        });
+        extractBy2Flag();
+
+        $('[name=spiderFieldHighSettingRadio]').on('ifChecked', function(event){
+            spiderFieldHighSettingRadio();
+        });
+        spiderFieldHighSettingRadio();
+
+    })
+
+</script>
+</body>
+</html>

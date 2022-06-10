@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.plugs.system.mapper.CommonMapper">
+
+    <insert id="insertUserInvite" parameterType="UserInvite" useGeneratedKeys="true" keyProperty="id">
+		insert into plugs_sys_user_invite(user_id,account,invite_user_id,ip,create_time)
+		values(
+		#{userId},#{account},#{inviteId},#{ip},sysdate()
+		)
+	</insert>
+
+    <resultMap id="userInviteResult" type="UserInvite">
+        <id     property="id"   column="id"     />
+        <result property="userId" column="user_id"   />
+        <result property="account" column="account"   />
+        <result property="inviteId" column="invite_user_id"   />
+        <result property="ip"   column="ip"      />
+        <result property="create_time" column="create_time"   />
+    </resultMap>
+    <select id="selectUserInvite" parameterType="String" resultMap="userInviteResult">
+		select id,user_id,account,invite_user_id,ip,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') create_time from plugs_sys_user_invite where invite_user_id=#{inviteId}
+	</select>
+    <select id="selectUserInviteCount" parameterType="String" resultType="int">
+		select count(1) from plugs_sys_user_invite where invite_user_id=#{inviteId}
+	</select>
+
+    <insert id="generalInsert" parameterType="map">
+        INSERT into ${tableName}
+        <foreach collection="data.entrySet()" index="key" open="(" separator="," close=")">
+            ${key}
+        </foreach>
+        values
+        <foreach collection="data.entrySet()" index="key" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </insert>
+    <select id="selectPrimaryKeys" parameterType="String"  resultType="String">
+        SELECT COLUMN_NAME 'key'
+        FROM `information_schema`.`COLUMNS`
+        WHERE (`TABLE_NAME` = #{tableName})
+          AND (`COLUMN_KEY` = 'PRI');
+    </select>
+    <select id="selectAllColumns" parameterType="String"  resultType="String">
+        SELECT COLUMN_NAME 'key'
+        FROM `information_schema`.`COLUMNS`
+        WHERE (`TABLE_NAME` = #{tableName})
+    </select>
+    <select id="selectAllTables"  resultType="String">
+        show tables
+    </select>
+    <select id="selectColumnExtraInfo" resultType="String">
+        SELECT extra FROM information_schema.columns WHERE    table_name =#{tableName} AND  column_name=#{columnName}
+    </select>
+    <select id="selectByMap" parameterType="map"  resultType="map">
+        SELECT *
+        FROM ${tableName}
+        <where>
+                <foreach collection="data.entrySet()" index="key" item="item" separator="and">
+                    ${key}=#{item}
+                </foreach>
+        </where>
+    </select>
+    <select id="selectDonateMap" parameterType="map"  resultType="map">
+        SELECT *
+        FROM ${tableName}
+        <where>
+            uid=#{data.uid} and
+            (donate_time between #{data.start_time} and #{data.end_time})
+        </where>
+    </select>
+    <select id="selectTableExists" parameterType="String"  resultType="int">
+        select count(1) from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA=#{dbName} and TABLE_NAME=#{tableName}
+    </select>
+
+</mapper>

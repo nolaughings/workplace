@@ -1,0 +1,52 @@
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td {
+    padding: 0;
+    margin: 0;
+}
+
+a {text-decoration: none;}
+a:hover {text-decoration:underline;cursor:pointer;} 
+
+.hd-title {
+    position: relative;
+    z-index: 99;
+    background: #191919;
+    line-height: 55px;
+    box-shadow: 0px 4px 8px rgb(0 0 0 / 10%);
+    color: #fff;
+}
+
+.container div{
+	display: inline-block;
+}
+
+.container .hd-title-left {
+	padding-left: 80px;
+    width: 164px;
+	color: #fff;
+    font-size: 18px;
+    text-align: center;
+}
+
+.hd-title-left .fl {
+    float: left;
+}
+
+.hd-title .container {
+    width: 100%;
+    padding: 0;
+}
+
+.container {
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.hd-title a {
+	color: #fff;
+}
+
+.fullpage-img img {
+    width: 100%;
+    height: auto;
+}

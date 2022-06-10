@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('在线编辑')" />
+	<th:block th:include="include :: layout-latest-css" />
+	<th:block th:include="include :: ztree-css" />
+	<style>
+		.CodeMirror{height:calc(100% - 50px) !important;font-family: Menlo,Monaco,Consolas,"Andale Mono","lucida console","Courier New",monospace;}
+	</style>
+</head>
+<body class="gray-bg">
+	<div class="ui-layout-west">
+		<div class="box box-main">
+			<div class="box-header">
+				<div class="box-title">
+					<i class="fa icon-grid"></i> 组织机构
+				</div>
+				<div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" id="btnExpand" title="展开" style="display:none;"><i class="fa fa-chevron-up"></i></button>
+					<button type="button" class="btn btn-box-tool" id="btnCollapse" title="折叠"><i class="fa fa-chevron-down"></i></button>
+					<button type="button" class="btn btn-box-tool" id="btnRefresh" title="刷新部门"><i class="fa fa-refresh"></i></button>
+				</div>
+			</div>
+			<div class="ui-layout-content">
+				<div id="tree" class="ztree"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="ui-layout-center">
+		<div class="container-div">
+			<div class="row">
+				<textarea id="textareaCode"></textarea>
+
+				<a class="btn btn-success" style="float: right;margin-right: 9px;margin-top: 8px;" onclick="save()">
+					<i class="fa fa-save"></i> 保存
+				</a>
+			</div>
+
+		</div>
+	</div>
+
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: layout-latest-js" />
+	<th:block th:include="include :: ztree-js" />
+
+	<!--下面两个是使用Code Mirror必须引入的-->
+	<link th:href="@{/ajax/libs/editormd/lib/codemirror/lib/codemirror.css}" rel="stylesheet"/>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/lib/codemirror.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/selection/selection-pointer.js}"></script>
+	<!--支持那种语言-->
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/mode/javascript/javascript.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/mode/clike/clike.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/mode/css/css.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/mode/xml/xml.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/mode/vbscript/vbscript.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/mode/htmlmixed/htmlmixed.js}"></script>
+
+
+	<!--引入css文件，用以支持主题-->
+	<link th:href="@{/ajax/libs/editormd/lib/codemirror/theme/eclipse.css}" rel="stylesheet"/>
+	<link th:href="@{/ajax/libs/editormd/lib/codemirror/theme/seti.css}" rel="stylesheet"/>
+	<link th:href="@{/ajax/libs/editormd/lib/codemirror/theme/dracula.css}" rel="stylesheet"/>
+
+	<!--支持代码折叠-->
+
+	<link th:href="@{/ajax/libs/editormd/lib/codemirror/addon/fold/foldgutter.css}" rel="stylesheet"/>
+
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/fold/foldcode.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/fold/foldgutter.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/fold/brace-fold.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/fold/comment-fold.js}"></script>
+	<!--括号匹配-->
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/edit/matchbrackets.js}"></script>
+	<!--自动补全-->
+	<link th:href="@{/ajax/libs/editormd/lib/codemirror/addon/hint/show-hint.css}" rel="stylesheet"/>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/hint/show-hint.js}"></script>
+	<script th:src="@{/ajax/libs/editormd/lib/codemirror/addon/hint/anyword-hint.js}"></script>
+	<script th:inline="javascript">
+
+		$(function() {
+		    var panehHidden = false;
+		    if ($(this).width() < 769) {
+		        panehHidden = true;
+		    }
+		    $('body').layout({ initClosed: panehHidden, west__size: 285 });
+            queryTree();
+		});
+
+		function queryTree()
+		{
+			var url = ctx + "sys/onlineEdit/fileList";
+			var options = {
+		        url: url,
+		        expandLevel: 1,
+				data:{
+                    simpleData : {
+                        enable : true,
+                        idKey : "id",
+                        pIdKey : "parentId",
+                        rootPId : "0"
+                    },
+                    key: {
+                        title: "name"
+                    }
+				},
+		        onClick : zOnClick
+		    };
+			$.tree.init(options);
+
+			function zOnClick(event, treeId, treeNode) {
+                var path=treeNode.parentPath;
+                nowPath=path;
+                if($.common.isNotEmpty(path)){
+                    getContent(path)
+				}
+			}
+		}
+
+		$('#btnExpand').click(function() {
+			$._tree.expandAll(true);
+		    $(this).hide();
+		    $('#btnCollapse').show();
+		});
+
+		$('#btnCollapse').click(function() {
+			$._tree.expandAll(false);
+		    $(this).hide();
+		    $('#btnExpand').show();
+		});
+
+		$('#btnRefresh').click(function() {
+			queryTree();
+		});
+
+        function getContent(filePath){
+
+            $.ajax({
+                type: "post",
+                url:ctx+"sys/onlineEdit/getContent",
+                dataType: "json",
+				data:{filePath:filePath},
+                beforeSend:function(){
+                    layer.load();
+                },
+                success:function(json) {
+                    layer.closeAll('loading');
+                    if(json.code == 0) {
+                        codeEdit.setValue(json.msg);
+                    }
+                }
+            });
+        }
+        function save(){
+            var content=codeEdit.getValue();
+            var filePath=nowPath;
+            $.ajax({
+                type: "post",
+                url:ctx+"sys/onlineEdit/save",
+                dataType: "json",
+                data:{filePath:filePath,content:content},
+                beforeSend:function(){
+                    layer.load();
+                },
+                success:function(json) {
+                    layer.closeAll('loading');
+                    if(json.code == 0) {
+                        $.modal.msgSuccess("保存成功!");
+                    }
+                }
+            });
+        }
+
+        var codeEdit;
+        var mixedMode = {
+            name: "htmlmixed",
+            scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache/i,
+                mode: null},
+                {matches: /(text|application)\/(x-)?vb(a|script)/i,
+                    mode: "vbscript"}]
+        };
+        function createEditor(){
+            codeEdit=CodeMirror.fromTextArea(document.getElementById("textareaCode"),{
+
+                // mode:"text/javascript",
+                mode:mixedMode,
+                selectionPointer: true,
+                //显示行号
+                lineNumbers:true,
+                // styleActiveLine: true, //line选择是是否加亮
+                selectionPointer: true,
+                //设置主题
+                theme:"default",
+                //绑定Vim
+                // keyMap:"vim",
+                //代码折叠
+                lineWrapping:true,
+                foldGutter: true,
+                gutters:["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                //全屏模式
+                fullScreen:true,
+                //括号匹配
+                matchBrackets:true
+                //extraKeys:{"Ctrl-Space":"autocomplete"}//ctrl-space唤起智能提示
+            });
+        }
+
+        $(function(){
+            createEditor();
+        });
+	</script>
+</body>
+</html>

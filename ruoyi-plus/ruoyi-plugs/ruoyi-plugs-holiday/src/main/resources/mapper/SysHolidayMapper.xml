@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.plugs.holiday.mapper.SysHolidayMapper">
+
+    <resultMap type="SysHoliday" id="SysHolidayResult">
+        <result property="id"    column="id"    />
+        <result property="year"    column="year"    />
+        <result property="code"    column="code"    />
+        <result property="name"    column="name"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="activityStartDate"    column="activity_start_date"    />
+        <result property="activityEndDate"    column="activity_end_date"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectSysHolidayVo">
+        select id, year, code, name, start_date, end_date, activity_start_date, activity_end_date, create_time from plugs_sys_holiday
+    </sql>
+
+    <select id="selectSysHolidayList" parameterType="SysHoliday" resultMap="SysHolidayResult">
+        <include refid="selectSysHolidayVo"/>
+        <where>
+            <if test="year != null  and year != ''"> and year = #{year}</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="params.holiday != null  and params.holiday == 'holiday'"> and DATE_FORMAT(now(),'%Y-%m-%d') BETWEEN DATE_FORMAT(start_date,'%Y-%m-%d')  and DATE_FORMAT(end_date,'%Y-%m-%d')</if>
+            <if test="params.holidayActivity != null  and params.holidayActivity == 'holidayActivity'"> and DATE_FORMAT(now(),'%Y-%m-%d') BETWEEN DATE_FORMAT(activity_start_date,'%Y-%m-%d')  and DATE_FORMAT(activity_end_date,'%Y-%m-%d')</if>
+        </where>
+    </select>
+
+    <select id="selectSysHolidayById" parameterType="Long" resultMap="SysHolidayResult">
+        <include refid="selectSysHolidayVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysHoliday" parameterType="SysHoliday" useGeneratedKeys="true" keyProperty="id">
+        insert into plugs_sys_holiday
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="year != null">year,</if>
+            <if test="code != null">code,</if>
+            <if test="name != null">name,</if>
+            <if test="startDate != null">start_date,</if>
+            <if test="endDate != null">end_date,</if>
+            <if test="activityStartDate != null">activity_start_date,</if>
+            <if test="activityEndDate != null">activity_end_date,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="year != null">#{year},</if>
+            <if test="code != null">#{code},</if>
+            <if test="name != null">#{name},</if>
+            <if test="startDate != null">#{startDate},</if>
+            <if test="endDate != null">#{endDate},</if>
+            <if test="activityStartDate != null">#{activityStartDate},</if>
+            <if test="activityEndDate != null">#{activityEndDate},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysHoliday" parameterType="SysHoliday">
+        update plugs_sys_holiday
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="year != null">year = #{year},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="activityStartDate != null">activity_start_date = #{activityStartDate},</if>
+            <if test="activityEndDate != null">activity_end_date = #{activityEndDate},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysHolidayById" parameterType="Long">
+        delete from plugs_sys_holiday where id = #{id}
+    </delete>
+
+    <delete id="deleteSysHolidayByIds" parameterType="String">
+        delete from plugs_sys_holiday where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

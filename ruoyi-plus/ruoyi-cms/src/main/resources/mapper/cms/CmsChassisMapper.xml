@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsChassisMapper">
+    
+    <resultMap type="CmsChassis" id="CmsChassisResult">
+        <result property="chassisId"    column="chassis_id"    />
+        <result property="chassisImg"    column="chassis_img"    />
+        <result property="chassisName"    column="chassis_name"    />
+        <result property="chassisFunction"    column="chassis_function"    />
+    </resultMap>
+
+    <sql id="selectCmsChassisVo">
+        select chassis_id, chassis_img, chassis_name, chassis_function from cms_chassis
+    </sql>
+
+    <select id="selectCmsChassisList" parameterType="CmsChassis" resultMap="CmsChassisResult">
+        <include refid="selectCmsChassisVo"/>
+        <where>  
+            <if test="chassisId != null "> and chassis_id = #{chassisId}</if>
+            <if test="chassisImg != null  and chassisImg != ''"> and chassis_img = #{chassisImg}</if>
+            <if test="chassisName != null  and chassisName != ''"> and chassis_name like concat('%', #{chassisName}, '%')</if>
+            <if test="chassisFunction != null  and chassisFunction != ''"> and chassis_function = #{chassisFunction}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsChassisByChassisId" parameterType="Long" resultMap="CmsChassisResult">
+        <include refid="selectCmsChassisVo"/>
+        where chassis_id = #{chassisId}
+    </select>
+        
+    <insert id="insertCmsChassis" parameterType="CmsChassis">
+        insert into cms_chassis
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="chassisId != null">chassis_id,</if>
+            <if test="chassisImg != null and chassisImg != ''">chassis_img,</if>
+            <if test="chassisName != null and chassisName != ''">chassis_name,</if>
+            <if test="chassisFunction != null and chassisFunction != ''">chassis_function,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="chassisId != null">#{chassisId},</if>
+            <if test="chassisImg != null and chassisImg != ''">#{chassisImg},</if>
+            <if test="chassisName != null and chassisName != ''">#{chassisName},</if>
+            <if test="chassisFunction != null and chassisFunction != ''">#{chassisFunction},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsChassis" parameterType="CmsChassis">
+        update cms_chassis
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="chassisImg != null and chassisImg != ''">chassis_img = #{chassisImg},</if>
+            <if test="chassisName != null and chassisName != ''">chassis_name = #{chassisName},</if>
+            <if test="chassisFunction != null and chassisFunction != ''">chassis_function = #{chassisFunction},</if>
+        </trim>
+        where chassis_id = #{chassisId}
+    </update>
+
+    <delete id="deleteCmsChassisByChassisId" parameterType="Long">
+        delete from cms_chassis where chassis_id = #{chassisId}
+    </delete>
+
+    <delete id="deleteCmsChassisByChassisIds" parameterType="String">
+        delete from cms_chassis where chassis_id in 
+        <foreach item="chassisId" collection="array" open="(" separator="," close=")">
+            #{chassisId}
+        </foreach>
+    </delete>
+
+</mapper>

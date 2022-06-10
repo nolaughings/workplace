@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增系统模块')" />
+    <th:block th:include="include :: select2-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-sysModule-add">
+
+            <h4 class="form-header h4">基本信息</h4>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">名称：</label>
+                        <div class="col-sm-8">
+                            <input name="name" class="form-control" type="text" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">父ID：</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input id="treeId" name="parentId" type="hidden" th:value="${sysModule?.id}"/>
+                                <input class="form-control" type="text" onclick="selectSysModuleTree()" id="treeName" readonly="true" th:value="${sysModule?.name}" >
+                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">模块代码：</label>
+                        <div class="col-sm-8">
+                            <input id="code" name="code" class="form-control" type="text" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">依赖模块：</label>
+                        <div class="col-sm-8">
+                            <select id="modules" name="dependencie"   class="form-control select2-multiple" multiple>
+                                <option th:each="item:${modules}" th:value="${item.id}" th:text="${item.name}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">模块类型：</label>
+                        <div class="col-sm-8">
+                            <div class="radio-box" th:each="dict : ${@dict.getType('module_type')}">
+                                <input type="radio" th:id="${'moduleType_' + dict.dictCode}" name="moduleType" th:value="${dict.dictValue}" th:checked="${dict.default}" required>
+                                <label th:for="${'moduleType_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">模块状态：</label>
+                        <div class="col-sm-8">
+                            <div class="radio-box" th:each="dict : ${@dict.getType('module_state')}">
+                                <input type="radio" th:id="${'moduleState_' + dict.dictCode}" name="moduleState" th:value="${dict.dictValue}" th:checked="${dict.default}" required>
+                                <label th:for="${'moduleState_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">版本号：</label>
+                        <div class="col-sm-8">
+                            <input id="version" name="version" class="form-control" type="text" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">上传源代码：</label>
+                        <div class="col-sm-8">
+                            <input  id="zipName" readonly class="form-control" type="text"  style="width:calc(100% - 100px);float: left; margin-right: 3px;display: none;">
+                            <button id="uploadBtnZip"  type="button" class="btn btn-sm btn-primary" style="display: inline-block; width: 95px;position: relative;float: left;height: 33px;"><i class="fa fa-check"></i>上传代码</button>&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">收费类型：</label>
+                        <div class="col-sm-8">
+                            <div class="radio-box" th:each="dict : ${@dict.getType('cms_pay_type')}">
+                                <input type="radio" th:id="${'payType_' + dict.dictCode}" name="payType" th:value="${dict.dictValue}" th:checked="${dict.dictValue=='0'}">
+                                <label th:for="${'payType_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="div_cost">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label"><span  style="color: red;font-size: 15px;vertical-align: middle;">*</span>&nbsp;支付费用：</label>
+                        <div class="col-sm-8">
+                            <input id="payCount" name="payCount"   th:onkeyup="setValue(this)" onchange="setValue()"  class="form-control" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">支付费用：</label>
+                        <div class="col-sm-8">
+                            <input id="payShow" name="payShow"  readonly class="form-control" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-4 control-label"><span style="color: red;font-size: 15px;vertical-align: middle;">*</span>&nbsp;封面图片：</label>
+                        <div class="col-sm-8">
+                            <input id="coverImg" name="coverImg"  readonly class="form-control" type="text"  style="width:calc(100% - 100px);float: left; margin-right: 3px;display: none;">
+                            <button id="uploadBtn"  type="button" class="btn btn-sm btn-primary" style="display: inline-block; width: 95px;position: relative;float: left;height: 33px;"><i class="fa fa-check"></i>上传封面</button>&nbsp;
+                        </div>
+                    </div>
+
+                    <div class="form-group mt20 mb-0">
+                        <div class="col-sm-12" style="padding-left: 20px;">
+                            <div class="col-sm-offset-4 col-sm-8" style="padding-left: 5px;">
+                                <ul class="row" id="imgList" style="padding-left: 0px;list-style: none;margin-left:0px;">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">图标图片：</label>
+                        <div class="col-sm-8">
+                            <input id="icon" name="icon" class="form-control" type="hidden">
+                            <button id="uploadBtnIcon"  type="button" class="btn btn-sm btn-primary" style="display: inline-block; width: 95px;position: relative;float: left;height: 33px;"><i class="fa fa-check"></i>上传图标</button>&nbsp;
+                        </div>
+                    </div>
+                    <div class="form-group mb-0" >
+                        <div class="col-sm-12" style="padding-left: 20px;">
+                            <div class="col-sm-offset-4 col-sm-8" style="padding-left: 0px;">
+                                <ul class="row" id="imgListIcon" style="padding-left: 0px;list-style: none;margin-left:0px;">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: -18px;">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">截图图片：</label>
+                        <div class="col-sm-10">
+                            <input id="imgs" name="imgs" class="form-control" type="hidden">
+                            <button id="uploadBtnImgs"  type="button" class="btn btn-sm btn-primary" style="display: inline-block; width: 95px;position: relative;float: left;height: 33px;"><i class="fa fa-check"></i>上传截图</button>&nbsp;
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-20" id="divImgs" style="display: none;">
+                        <div class="col-sm-12" style="padding-left: 20px;">
+                            <div class="col-sm-offset-2 col-sm-10" style="padding-left: 0px;">
+                                <ul class="row" id="imgListImgs" style="padding-left: 0px;list-style: none;margin-left:0px;">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="form-header h4">详细信息</h4>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">描述：</label>
+                        <div class="col-sm-10">
+                            <textarea name="description" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="col-xs-2 control-label">详细信息:</label>
+                        <div class="col-xs-10">
+                            <script id="editor" name="detail" type="text/plain" ></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input id="zipPath" name="zipPath" class="form-control" type="hidden">
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: ueditor" />
+    <th:block th:include="include :: select2-js" />
+    <script th:src="@{/ajax/libs/plupload/plupload.full.min.js}"></script>
+    <script th:src="@{/ruoyi/js/plupload.js}"></script>
+    <script type="text/javascript">
+        var btns = new Array("uploadBtn","uploadBtnIcon");
+        var detail=
+            {"uploadBtn":{
+                    valueId:"coverImg",
+                    listId:"imgList",
+                    type:"url"
+                },
+                "uploadBtnIcon":{
+                    valueId:"icon",
+                    listId:"imgListIcon",
+                    type:"url"
+                }
+            };
+        $.Pluploader.init(btns,"","","img","2mb",detail);
+
+        var btns2 = new Array("uploadBtnZip");
+        $.Pluploader.init(btns2,"",uploadCallback2,"zip","10mb");
+        function uploadCallback2(self,json) {
+            layer.closeAll();
+            $("#zipPath").val(json.url);
+            $("#zipName").show();
+            $("#zipName").val(json.fileName);
+        }
+
+        var btns3 = new Array("uploadBtnImgs");
+        var detail3={"uploadBtnImgs":{
+                    valueId:"imgs",
+                    listId:"imgListImgs",
+                    type:"id",
+                    callBackAppend:callBackAppend,
+                    deleteAppend:deleteAppend
+            }};
+        $.Pluploader.init(btns3,ctx + "common/upload?attachment=1","","img","2mb",detail3);
+        function callBackAppend() {
+            $("#divImgs").show();
+        }
+        function deleteAppend() {
+            var len=$("#imgListImgs").find("li").length;
+            if(len==0){
+                $("#divImgs").hide();
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        var ue = UE.getEditor('editor');
+        function getContent() {
+            return UE.getEditor('editor').getContent();
+        }
+        function getContentTxt() {
+            return UE.getEditor('editor').getContentTxt();
+        }
+    </script>
+    <script th:inline="javascript">
+        var prefix = ctx + "plugs/sysModule"
+        $("#form-sysModule-add").validate({
+            onkeyup: false,
+            rules:{
+                code:{
+                    remote: {
+                        url: prefix + "/checkCodeUnique?n="+new Date().getTime(),
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "code": function() {
+                                return $.common.trim($("#code").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+                },
+            },
+            messages: {
+                "code":{
+                    remote: "模块代码已经存在!"
+                }
+            },
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+
+                var coverImg=$("#coverImg").val();
+                if(isEmpty(coverImg)||coverImg==null||coverImg=='null'){
+                    Fast.msg_error("请选择封面图片!");
+                    return;
+                }
+                var detail=getContent();
+                if(isEmpty(detail)){
+                    Fast.msg_error("请输入详细信息");return;
+                }
+                $.operate.save(prefix + "/add", $('#form-sysModule-add').serialize());
+            }
+        }
+
+        /*系统模块-新增-选择父部门树*/
+        function selectSysModuleTree() {
+            var options = {
+                title: '系统模块选择',
+                width: "380",
+                url: prefix + "/selectSysModuleTree/" + $("#treeId").val(),
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+               $("#treeId").val(body.find('#treeId').val());
+               $("#treeName").val(body.find('#treeName').val());
+               layer.close(index);
+        }
+
+        function setValue(obj){
+            if($(obj)&&$(obj).val()){
+                $(obj).val($(obj).val().replace(/\D/g,''));
+            }
+            var v=$("[name=payType]:checked").val();
+            var payCount=$("#payCount").val();
+            if($.common.isNotEmpty(payCount)){
+                if(v=="0"){//免费
+                    $("#payCount").val("")
+                    $("#payShow").val("免费");
+                }else if(v=="1"){//积分
+                    $("#payShow").val(payCount+"积分");
+                }else{//人民币
+                    $("#payShow").val("¥"+payCount);
+                }
+            }else{
+                $("#payShow").val("");
+            }
+
+        }
+
+        $(function(){
+            $("#editor").css("height","380px");
+            showHideValue();
+            $('[name=payType]').on('ifChecked', function(event){
+                showHideValue();
+                setValue();
+            });
+
+        })
+        function showHideValue(){
+            var v=$("[name=payType]:checked").val();
+            if(v=="0"){//免费
+                $("#div_cost").hide();
+                $("#payCount").removeAttr("required");
+            }else{
+                $("#div_cost").show();
+                $("#payCount").attr("required","required");
+            }
+        }
+
+
+    </script>
+</body>
+</html>

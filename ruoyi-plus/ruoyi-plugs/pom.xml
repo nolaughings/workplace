@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ruoyi</artifactId>
+        <groupId>com.ruoyi</groupId>
+        <version>4.7.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ruoyi-plugs</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>ruoyi-plugs-system</module>
+        <module>ruoyi-plugs-web</module>
+        <module>ruoyi-plugs-ehcache</module>
+        <module>ruoyi-plugs-oss</module>
+        <module>ruoyi-plugs-redis</module>
+        <module>ruoyi-plugs-third</module>
+        <module>ruoyi-plugs-common</module>
+        <module>ruoyi-plugs-framework</module>
+        <module>ruoyi-plugs-pv</module>
+        <module>ruoyi-plugs-holiday</module>
+        <module>ruoyi-plugs-province</module>
+        <module>ruoyi-plugs-highschool</module>
+        <module>ruoyi-plugs-thirdlogin</module>
+        <module>ruoyi-plugs-blog</module>
+    </modules>
+
+
+</project>
